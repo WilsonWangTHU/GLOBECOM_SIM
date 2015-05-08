@@ -1,0 +1,221 @@
+\documentclass[conference]{IEEEtran}
+\makeatletter
+\newcommand{\rmnum}[1]{\romannumeral #1}
+\newcommand{\Rmnum}[1]{\expandafter\@slowromancap\romannumeral #1@}
+\makeatother
+
+\usepackage{epsfig}
+\usepackage{amsopn}
+\usepackage{subfigure}
+\usepackage{cite}
+\ifCLASSINFOpdf
+
+\else
+\fi
+
+\usepackage[cmex10]{amsmath}
+
+\interdisplaylinepenalty = 2500
+
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+
+\begin{document}
+\title{Access Points Selection in Super WiFi Network Powered by Solar Energy Harvesting}
+
+\author{\authorblockN{Tingwu~Wang\authorrefmark{1}, Chunxiao~Jiang\authorrefmark{1}, Yan~Chen\authorrefmark{2}, Yong~Ren\authorrefmark{1}, and K. J. Ray~Liu\authorrefmark{2}}
+      \small\authorblockA{\authorrefmark{1}Department of Electronic Engineering, Tsinghua University, Beijing, 100084, P. R. China\\
+          \authorrefmark{2}Department of Electrical and Computer Engineering, University of Maryland, College Park, MD 20742, USA\\
+        E-mail: wtw12@mails.tsinghua.edu.cn, \{jchx, reny\}@tsinghua.edu.cn, \{yan, kjrliu\}@umd.edu}}
+
+\maketitle
+
+\begin{abstract}
+Super WiFi is expected to enable the Internet access everywhere in a country. Considering the infrastructure deployment issues, energy harvesting technology is a promising solution for power supply. Most of existing works focused on the energy scheduling from the network operator's point of view. In this paper, we study the access point selection strategy from user's perspectives in Super WiFi networks powered by solar energy harvesting. Although the network selection problem has been studied, the energy harvesting scenario has not been investigated and the influence of battery condition has not been taken into account. In our work, we consider the utility of the access users is affected not only by the total number of accessed users, but also the battery condition. In order to formulate the battery states and user states, we incorporate the physical characteristics of solar cell, as well as the dynamic access behaviors of users through Markov Decision Process (MDP)model. By using the value iteration method, the set of optimal network selection strategies is obtained. Simulation results validate that our method has a remarkable performance improvement of utility over the myopic and random access strategies.
+\end{abstract}
+\IEEEpeerreviewmaketitle
+
+\section{Introduction}
+
+In recent years, Super WiFi using IEEE 802.11af standard, was announced by the Federal Communications Commission (FCC), aiming to expand the coverage of wireless network access. Since the access points (AP) of Super WiFi will be deployed everywhere, the associated infrastructure including backhaul and energy supply system have to be simplified as much as possible to decrease the deployment cost. Wireless backhual has been proved to be able to substitute traditional wired backhaul \cite{30}. While for the power supply problem, constant battery replacement comes with high labor cost and additional administrative fee. The recent energy harvesting (EH) technology provide with an ideal solution for the power supply problem in Super WiFi. Wireless network service supplied by EH is equipped with devices that could harvest ambient energy including piezoelectric, thermal, solar energy etc. Some preliminary studies have been done on the applications of EH wireless network service, addressing the modification that is required to the current WLAN standard for better support \cite{27}. \\
+%%%%%%
+\indent In Super WiFi networks, when confronted with many APs, how a user makes the AP selection is a critical issue. Especially, when it comes to AP supplied by solar energy, the energy condition of each AP should be taken into account, besides quality of service (QoS). In order to solve the selection problem, many researches have been done in the literature. Markov Decision Process (MDP) has been used in AP selection game, e.g., some strategies, challenges and solutions were summarized in \cite{23}. As AP selection is a typical game problem \cite{22}, game theory has also been used as an effective approach. In \cite{7}, the selection problem was formulated from a pricing game perspective. Meanwhile, the characteristic of negative externality was considered in \cite{5} and \cite{21}, where a maximum number of access users for each AP was set and the utility is closely related with the number of access users. When it comes to AP selection algorithm, a no regret algorithm was designed in \cite{11} to help users to select among distributed APs. For the EH wireless network service, it has been widely studied as in \cite{17,18,19}. In \cite{17}, the authors characterized the indoor light energy availability and studied the energy allocation. In \cite{18}, the routing algorithms were explored from a network topology aspect. An opportunistic routing protocol was studied in \cite{19}, and the authors compared the proposed protocols with non-opportunistic protocols in wireless sensor networks using ambient energy harvesters (WSN-HEAP).\\
+\indent However, all the existing works on network service selection have not considered the situation of APs supplied by ambient power. Apparently, for Super WiFi, EH is the most feasible way that could solve the energy supply problem. In addition, the previous works have separated the APs and users, i.e., either focusing on the transmitting strategies of the APs, or the users' access strategies, by assuming the other part is stable or invariant. However, in practical EH based networks, users are changing in number and distribution, as well as the APs' energy status and channel conditions. Therefore, APs and users are affecting each other, and should be considered simultaneously. Considering these problems, we focus on the problem of AP selection game in a wireless network service powered by ambient solar energy, which has a promising industry future as a key component in Super WiFi. Specifically, we formulate the user model and AP's battery model, considering their interaction effect and the battery physical features through MDP formulation. The optimal AP selection strategy is obtained by a designed value iteration algorithm.\\
+\indent The rest of this paper is organized as follow. We describe the system model In Section \Rmnum{2}. The optimal selection based on MDP model is presented in Section \Rmnum{3}, including the battery model, user access model and the AP selection algorithm. In Section \Rmnum{4}, we evaluate the performance of our proposed approach. Finally, Section \Rmnum{5} draws the conclusion.
+
+\section{System Model}
+In this section, we describe the overall picture of the EH based Super WiFi system and how we model the problem. As shown in Fig. 1, a Super WiFi system consists of \(N\) APs that are supplied by solar energy harvesting is considered. The APs of the system are connected to the server through wireless backhaul. In each time slot, new arriving users can access one of the available APs and stay connected until he/she leaves the associated AP. In the system, we assume that each AP has a maximum number of accessed users \(U_M\), i.e., if a user intends to access a AP whose accessed user number \(U_i = U_{M}\), the access will be denied. For the AP's battery condition, it is quantized into several discrete levels, where the maximum number of levels is denoted as \(B_M\).\\
+\indent Since the number of the users accessing one AP and the battery quantity of that AP are different from those of other APs, the QoS one AP provides is also quite different from others'. If we denote the quantized battery level of the \(i^{th}\) AP as \(B_i\), then the utility of the users defined as the individual throughput, can be written by
+\begin{equation}
+R_i = W_i \log\left(1 + \frac {P_T(U_i, B_i) / N_0} {(U_i-1)P_I/N_0+1}\right) ,
+\end{equation}
+where \(B_{i} \in \{ j \mid j = 0,1,...,B_M - 1\}\) and \(U_{i} \in \{ i \mid i = 0,1,...,U_M\}\). In the expression, the $W_i$ is the bandwidth, \(N_0\) is the noise power, which we assume to be the same between every AP and users and remain constant all the time. The signal-to-noise power ratio is \({P_T(U_i, B_i)}/ {N_0}\) and the interference-to-noise power ratio is \({P_I} / {N_0}\). The \(P_T(U_i, B_i)\) is the function of the power used to transmit the pockets to users of the AP. The transmitting power of the APs usually increases with the battery level and the user number. The exact expression is beyond the discussion of this work, which is stipulated by the using WLAN standards \cite{29} and studied in \cite{25}.\\
+% % %
+
+\section{AP Selection Strategy based on MDP}
+\indent In this section, we analyze users' AP selection strategy in EH based Super WiFi networks. Usually, after a user access one specific AP, he/she would stay connected for a period of time, and thus the long-term utility that can be obtained within this period should be considered. Therefore, we use MDP model to formulate this AP selection problem. Here, the system state is defined as both the user number staying in one AP and the remaining battery quantity. In the following, we will first discuss how we formulate the user states and the battery states, and then propose a value iteration algorithm to derive the optimal strategy.
+\subsection{Battery Model}
+\indent Quantization of the battery quantity to an appropriate number of levels is necessary. There is a trade off between the accuracy of the algorithm and the amount of the states. In our evaluation, four or five levels of battery conditions would return a result that is accurate enough and not having a big algorithm complexity.\\
+\begin{figure}[t]
+\centering
+\includegraphics[width=8.5cm]{figure1.eps}\\
+\caption{A schematic map of Super WiFi system, and a common system model of a solar cell.}
+\end{figure}
+\indent If the duration \(T\) of the time slot is small enough, a battery level could only switch from a level to its adjacent levels at the end of each time slot in a discrete time system. The transition of a level to its neighbour is simultaneously determined by the energy the AP harvests and the energy it consumes when transmitting pockets. As, given the system state, the transmitting power is already known, the following part of this subsection demonstrates the formulation of relationship from the battery level to the harvesting power.\\
+\indent The harvesting power is determined by the illumination and the battery level. In this paper, a classic physical model of the photoelectric battery was used, showed in Fig. 1. The harvesting power first increases with the voltage and then decreases to zero when the maximum voltage is reached, as is showed in Fig. 2. Considering the ideal model of the solar cell, the relation between the current and the voltage are given in \cite{2} as
+\begin{equation}
+\begin{aligned}
+J(V) = J_{SC} - J_o\left(e^{\frac{qV} {k_B T_\kappa}} - 1\right),
+\end{aligned}
+\end{equation}
+where the \(k\) and \(T_\kappa\) is the boltzmann's constant and temperature. In the equation, \(J(V)\) is the current density. When illuminated area and the number of cells connected in one harvesting device is constant, the scale factor \(\rho\) from \(J\) to harvesting power is only linearly affected by illumination level \(\zeta\). In a specific period of the day, \(\zeta\) could be regarded as Gaussian distributed with an average illumination intensity. When time slot \(T\) is small enough, the illumination could be regarded as invariable in each time slot. And if we denote the distribution center of \(\rho\) with the average illumination level \(\bar{\zeta}\) as \(\bar{\rho}_\zeta\), the probability density function of \(\rho\) is given as
+\begin{equation}
+\begin{aligned}
+f_{\rho}(x) = \frac {1} {\sqrt {2\pi}\sigma} e ^{-\frac {(x-\bar{\rho}_\zeta)^2} {2 {\sigma}^2}},
+\end{aligned}
+\end{equation}
+where \(\sigma\) is the standard deviation.
+The battery quantity of the \(i^{th}\) battery level \(B_i\) is approximated as \(\overline {B_i}\) and from the electrical formula between voltage and energy quantity in a capacitor, we have \(V = \sqrt{ \frac{2 \overline{B_i}} {C}}\). Thus the function of harvesting power with the voltage is is given as
+\begin{equation}
+\begin{aligned}
+P_H(B_i) = \rho\left(J_{SC} - J_o\left(e^{\frac{qV / C} {k_B T}} - 1\right)\right) \cdot V,
+\end{aligned}
+\end{equation}
+Thus the relation between the battery level and the harvesting power is formulated. \\
+\indent For denotation convenience, the \(k^{th}\) APs in the Super Wifi system is refer to as AP \(k\), where \(k \in \{ 1,2,3,...,N \}\). As the transmitting power and harvesting power are known, spontaneously, we could give the transition probability of the battery level of AP \(k\) from level \(i\) to level \(j\) after each time slot, where \(0 \le j \le B_{M} - 1\), and \(0 \le i \le B_{M} - 1\).
+\begin{align}
+&\beta_{k}(j\mid i,U_k) =\\
+&\quad\begin{cases}
+\mbox{Pr}\{P_H(k) - P_T (U_k, i) >  {\Delta B_{i,j}}  /T  \}, &\mbox{if $j=i+1$},\\
+\mbox{Pr}\{P_T (U_k, i) - P_H(k) > {\Delta B_{j,i}}  /T  \}, &\mbox{if $j=i-1$ },\\
+0, &\mbox{if $|j-i|>1$},\\
+1 - \sum_{m=0, m\ne i}^{m = B_{M} -1}\beta_{k}(m\mid i), &\mbox{if $j=i$},
+\end{cases}\nonumber
+\end{align}
+where the \(\Delta B_{i,j}\) is the average battery quantity difference between the battery level \(i\) and \(j\).
+\begin{figure}
+\centering
+\includegraphics[width=8.5cm]{figure2.eps}\\
+\caption{The current density versus voltage curves and the harvesting power of a cell versus the voltage. The key parameters, \(J_{SC} = 13.364\mbox{mA cm}^{-2}\) and \(V_{OC} = 0.7631\mbox{V}\) is obtained from the work done by Hsiang-Yu Chen \cite{3}.}
+\end{figure}
+\subsection{User Model}
+In the Super WiFi system, two kinds of users are considered. One is self-directed users (SDU) such as the mobile phone users that have several APs in its reach. They could decide which AP to access, and they arrive at a rate of \(\lambda_0\). And the other kind is passive users (PU), for example, the fixed temperature sensors in hospitals. They could only access one specific AP unless the AP is full. For the AP \(k\), its PUs arrive with Poisson arrival distributed rate \(\lambda_{k}\). And the departure rate of all the users in APs is exponential distributed with parameter \(\mu\). To make the formulation clear and concise, we construct a fiducial transition probability from user state \(i\) to user state \(j\) not considering other SDUs and conflicts as follow,
+\begin{equation} \psi_{k}(j \mid i) =
+\begin{cases}
+\lambda_k(1 - i\mu), &\mbox{if $j=i+1,$}\\
+i\mu(1 - \lambda_k), &\mbox{if $j=i-1,$}\\
+0, &\mbox{if $|j-i|>1.$}\\
+\end{cases}
+\end{equation}
+The total system state including all the APs inside is denoted as a vector \(S = (B_1,U_1,B_2,U_2,...B_N,U_N)\). Given the system states, the SDUs will choose their optimal strategy denoted as \(\pi(S)\). When the conflict of PUs happens, a re-access is carried out. When a PD failed to access an AP because it is full, he/she will be immediately send to a available new AP chosen by the Super Wifi system. A greedy re-access protocol is used by the system. The stand-by AP is given by
+\begin{equation}
+\begin{aligned}
+\xi(S)=\arg\underset{i < B_{M}}{\max}\, W_i \log\left(1 + \frac {P_T(U_i + 1, B_i) / N_0} {(U_i)P_I/N_0+1}\right).
+\end{aligned}
+\end{equation}
+The probability of conflict of a full AP \(k\) in the next time slot is \((1-U_M \mu)\lambda_k\). Thus, the fiducial transition probability could renew into the real transition probability as below:
+\begin{equation}
+\begin{aligned}
+\psi_{\xi(S)}(i+1 \mid i)= &\psi_{\xi(S)}(i+1 \mid i) +\\
+&\sum_{m = 1,U_m = U_M}^{N}(1-U_M \mu) \lambda_m,\\
+\end{aligned}
+\end{equation}
+\begin{equation}
+\begin{aligned}
+\psi_{\pi(S)}(i+1 \mid i) = \psi_{\pi(S)}(i+1 \mid i) + \lambda_0,
+\end{aligned}
+\end{equation}
+and the probability that the system would remain the same is calculated as,
+\begin{equation}
+\begin{aligned}
+\psi_{\pi(S)}(i \mid i) = 1 - \sum\nolimits_{m=0, m\ne i}^{m = B_{M} -1}\psi_{k}(m\mid i).\\ %\qquad\mbox{if $j=i$}.\\
+\end{aligned}
+\end{equation}
+The final system transition probability is defined as follow:
+\begin{equation}
+\begin{aligned}
+P(S'\mid S) = \prod\limits_{k=1}^N \psi_{k}(U_k' \mid S)\beta_{k}(B_k' \mid S).
+\end{aligned}
+\end{equation}
+\subsection{Expected Utility}
+A MDP over infinite horizon is considered to obtain the utility of the users. As the PUs are heteronomous, we consider the selection of AP for SDUs. A SDU can not change his AP after accessing, and we use \(\gamma\) to denote the accessed AP. The utility until he leaves is denoted as \(V_{\gamma}(S_0)\). Then his expected utility could be given as,
+\begin{equation}
+\begin{aligned}
+V_{\gamma}(S_0) = E \left(\sum\limits_{t=0}^\infty (1-\tau)^t R_{\gamma}(S_t)\Bigg| S_0\right).
+\end{aligned}
+\end{equation}
+Here \(1 - \tau\) is the discount factor. For iteration algorithm, the equation above could also be written in a recursive way \cite{26},
+\begin{equation}
+\begin{aligned}
+V_{\gamma}(S_0) = R_{\gamma}(S_0) + (1-\tau) \sum\limits_{S'}P_{\gamma}(S'|S_0)V_{\gamma}(S').
+\end{aligned}
+\end{equation}
+Given that the SDU accesses and stays in \(\gamma\), the fiducial transition probability \(\psi_{k}(j \mid i)\) is not the same as the equation (5), but
+\begin{equation}
+\psi_{k}(j \mid i, \gamma) =
+\begin{cases}
+\lambda_k(1- (i - 1)\mu), &\mbox{if $j=i+1,k = \gamma$},\\
+\lambda_k(1- i\mu), &\mbox{if $j=i+1,k \neq \gamma$},\\
+(1 - \lambda_k)(i - 1)\mu, &\mbox{if $j=i-1, k = \gamma $},\\
+(1 - \lambda_k)i\mu, &\mbox{if $j=i-1, k \neq \gamma$},\\
+0, &\mbox{if $|j-i|>1$}.
+\end{cases}
+\end{equation}
+To solve the real transition probability, the strategy of newcome SDUs is needed. In system \(s\), the strategy of newcome SDUs is given as,
+\begin{equation}
+\begin{aligned}
+\pi_s = \arg \underset {k \leq N}{\max} \ V_{k}(s'),
+\end{aligned}
+\end{equation}
+where \(s'\) is the system state that is different to \(s\) only in that \(U_k' = U_k + 1\), as the access of the AP \(k\) will lead the system state from \(s\) to \(s'\). With the optimal strategy obtained, the transition probability could be calculated by applying equations (8) to (10). In order to solve the MDP iteration, we use the algorithm showed in the table above, which is a revised form of value iteration, first used in \cite{5}.\\
+\indent As no SDUs could gain a higher expected utility by not choosing the optimal strategy in the profile, the optimal strategy meets a Nash equilibrium.
+\begin{algorithm}[t]
+\caption{Value iteration algorithm}
+\label{alg}
+\begin{algorithmic}
+\STATE /********Initialization*********/
+\STATE Initialize the \(V_k^{(0)}(s)\leftarrow 0\) for all \(s \in \mathcal{S}\), \(k \in \mathcal{AP}\)
+\STATE Initialize the \(\pi^{(0)}(s)\leftarrow 1\) for all \(s \in \mathcal{S}\), \(k \in \mathcal{AP}\)
+\STATE /***********Iteration**********/
+\WHILE{\(\max\limits_s \mid V_k^{(t)}(s) - V_k^{(t+1)}(s)\mid >\epsilon\)}
+\STATE for all \(s \in \mathcal{S}\), \(k \in \mathcal{AP}\)
+\STATE {\( V_k^{t+1}(s) \leftarrow R_{k}(s)\ \)+ \\
+\(\qquad\qquad\qquad(1-\tau)\sum\limits_{s'}P_{k}(s'|s,\pi^t)V_k^t(s')\).}
+\STATE \(\pi^{(t+1)}(s) \leftarrow \arg\underset{\gamma \leq N}{\max}\, V_{\gamma}(\tilde{s})\),\\
+            where \(s'\) is the system state different \\
+            \qquad\qquad\qquad from \(s\) only in that \(U_k' = U_k + 1\)
+\ENDWHILE
+\STATE /***********Output***********/
+\STATE \( \pi^{\ast}(s) \leftarrow \pi^{t+1}(s)\).
+\STATE \( V^{\ast}(s) \leftarrow \underset{\gamma \leq N}{\max}\, V_{\gamma}(\tilde{s})\).
+\end{algorithmic}
+\end{algorithm}
+\section{Simulation Results}
+\begin{figure}
+\centering
+\includegraphics[width=8.5cm]{newResult2.eps}\\
+\caption{The convergence of the MDP value iteration.}
+\end{figure}
+In this section, the convergence and effectiveness of the proposed algorithm are illustrated. In the effectiveness simulation, myopic strategy and random strategy are used as comparations. The myopic strategy is the strategy that SDU users will access the AP that could provide the maximum immediate reward, namely, \(\pi_s^{myopic} = \arg \underset {k \leq N}{\max} \ R_{k}(s)\). The random strategy is that the SDUs will access random AP that is in the Super WiFi system, i.e. \(\mbox{Pr}\{\pi_s^{rand} = i\} = \frac {1} {N}\). According to model and analysis in the Section \Rmnum{2}, \Rmnum{3}, we ascertain several important coefficients. Firstly, same battery quantity differences between the adjacent battery levels is used, i.e. dividing the battery quantity into isometric discrete battery levels. The parameters of the solar cell in \cite{3} is used. As the maximum voltage and storage vary with the number of cells, in this simulation, four power coefficients are of the same order. The charging power \(\max \, P_{H}\), the energy gap between adjacent battery levels divided by the time \(\Delta B / (T \cdot N_0)\), and the power \(P_T\), \(P_I\) are of the same order. We have \(P_T / N_0 = 10\), \(P_I / N_0 = 10\), \(\Delta B / (T \times N_0) = 6\) and \(\max P_{H} / N_0 = 6,...,10\) when \(\bar{\zeta} = 6 \zeta_{Unit},...,10\zeta_{Unit}\). The simulation was operated 10000 times to avoid random error. \\
+\indent In Fig. 3, the convergence of the MDP value iteration was illustrated. The Fig. 3(a) is a picture illustrating the sum of \(\mid V_k^{t+1}(s) - V_k^{t}(s)\mid^2\), for all \(s \in \mathcal{S}\), \(k \in \mathcal{AP}\). And Fig. 5(b) illustrates the number of different AP selections between adjacent iterations. From the \(15^{th}\) iteration, the selection strategy remains the same after every iteration and the result is not drawn in the Fig. 3(b). The figure shows that our MDP converges in an exponential way.\\
+\indent In Fig. 4, the performance versus arrival rate of the SDUs \(\lambda_0\) and the leaving rate \(\mu\) is evaluated. The coefficients are \(\lambda_1 = \lambda_2 = \lambda_3 = 0.1\),\ \(N = 3\) APs, with \(U_i = 0, 1,...,4\) and \(B_M=4\), \(\zeta = 10 \zeta_{Unit}\). In Fig. 4(a) \(\mu = 0.1\), and in Fig. 4(b) \(\lambda_0 = 0.1\). It is showed in the figure that the proposed strategy has an evident advantage over the myopic one, and random strategy performs the worst. In Fig. 4(a), the myopic utility is set to 1 and normalized the other two accordingly. In Fig. 4(b), the utility decreases with departure rate, as users stay shorter in the system. When \(\mu\) gets bigger, the proposed strategy has less advantage over the myopic. Because a shorter stay time results in more importance of immediate reward.\\
+\indent Fig. 5 shows the performance of different strategies under different illumination level. The parameters are \(\lambda_0 = \lambda_1 = \lambda_2 = \lambda_3 = 0.1\), \(\mu = 0.1\), \(N = 3\) APs, and \(U_i = 0, 1,...,4\), \(B_M=4\). All the strategy has a trend of expecting a higher utility as there is more solar energy. And the proposed strategy has a stable advantage over the other two.\\
+\begin{figure}
+\centering
+\includegraphics[width=8.5cm]{newResult1.eps}\\
+\caption{The performance of the proposed strategy, myopic strategy and the random strategy is evaluated versus the arrival rate of the SDUs and the departure rate of the users in the APs.}
+\end{figure}
+\section{Conclusion}
+In this paper, we have studied the selection problem of AP in Super WiFi powered by solar energy with negative externality. We in this work formulate the user number and the battery level of each AP as Markov states. We successfully construct the transition probability and use value iteration algorithm to solve the optimal selection strategy in MDP. The result of our proposed algorithm shows that our formulation and algorithm are correct and reliable, with the proposed strategy having a stable and evident outperformance. Our work could be instructive for the development of Super WiFi, providing an effective selection strategy.
+\begin{figure}
+\centering
+\includegraphics[width=8.5cm]{newResult3.eps}\\
+\caption{The different performance of three strategies under different illumination levels.}
+\end{figure}
+\bibliographystyle{IEEEtran}
+\bibliography{Ref}
+\end{document}
+
+

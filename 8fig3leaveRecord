@@ -1,0 +1,58 @@
+ //****************\\
+||   pomdp-solve    ||
+||     v. 5.3       ||
+ \\****************//
+      PID=9664
+- - - - - - - - - - - - - - - - - - - -
+time_limit = 0
+force_rounding = false
+mcgs_prune_freq = 100
+verbose = context
+stdout = 8fig3leaveRecord
+inc_prune = normal
+history_length = 0
+prune_epsilon = 0.000000
+save_all = false
+o = 8fig3leaveRateResult
+fg_save = false
+enum_purge = normal_prune
+fg_type = initial
+fg_epsilon = 0.000000
+mcgs_traj_iter_count = 1
+lp_epsilon = 0.000000
+end_epsilon = 0.000000
+start_epsilon = 0.000000
+dom_check = false
+stop_delta = 0.010000
+q_purge = normal_prune
+pomdp = ./8fig3leaveRate
+mcgs_num_traj = 1000
+stop_criteria = bellman
+method = incprune
+memory_limit = 0
+alg_rand = 0
+terminal_values = 
+save_penultimate = false
+epsilon = 0.000000
+rand_seed = 
+discount = -1.000000
+fg_points = 10000
+fg_purge = normal_prune
+fg_nonneg_rewards = false
+proj_purge = normal_prune
+mcgs_traj_length = 100
+history_delta = 0
+f = 
+epsilon_adjust = 0.000000
+grid_filename = 
+prune_rand = 0
+vi_variation = normal
+horizon = 0
+stat_summary = false
+max_soln_size = 0.000000
+witness_points = false
+- - - - - - - - - - - - - - - - - - - -
+[Initializing POMDP ... 
+** PROGRAM ABORTED **
+	Could not successfully parse file: ./8fig3leaveRate.
+
